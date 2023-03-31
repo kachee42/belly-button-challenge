@@ -13,7 +13,7 @@ function init() {
 
     // get data
     d3.json(url).then(function(data) {
-        names = data.names;
+        let names = data.names;
         
         // iterating over names and adding to dropdown menu
         for (let i = 0; i < names.length; i++) {
@@ -89,28 +89,32 @@ function buildBubblechart(sample) {
         let sample_values = result.sample_values;
         let otu_labels = result.otu_labels;
 
-        // Conditional to set colors
-
-
         // Create trace for chart
         let trace1 = {
-            x: otu_ids.map(object => object),
-            y: sample_values.map(object => object),
+            x: otu_ids,
+            y: sample_values,
+            type: "scatter",
             mode: "markers",
             marker: {
-                size: sample_values.map(object => object/1.5)
+                size: sample_values.map(object => object/1.5),
+                color: otu_ids,
+                colorscale: "Earth"
             },
-            color: otu_ids.map(object => object),
-            text: otu_labels.map(object => object)
+            text: otu_labels
         };
+
+        // Layout to add in x axis label
+        let layout = {
+            xaxis: {
+                title: "OTU ID"
+                }
+            };
         
-        // Create layout to hold 
         // put data object into an array
         let traceData = [trace1];
 
         // plot the bubble chart
-        Plotly.newPlot("bubble", traceData);
-
+        Plotly.newPlot("bubble", traceData, layout);
     })
 }
 
@@ -136,11 +140,14 @@ function buildMetadata(id) {
         // Get CSS selector for the metadata section
         let dataBox = d3.select("#sample-metadata");
         
+        // Clear any existing data from the metadata section
+        dataBox.html("");
+
         // iterate over metadata and add to HTML
-        for (let i = 0; i < result.length; i++) {
+        for (let i = 0; i < labels.length; i++) {
             dataBox
-                .appendChild("h5")
-                .text(labels[i], values[i]);
+                .append("h5")
+                .text(labels[i] + ": " + values[i]);
         }
     })
 }
